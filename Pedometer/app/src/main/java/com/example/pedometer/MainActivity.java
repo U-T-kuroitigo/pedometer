@@ -19,6 +19,8 @@ import android.hardware.SensorManager;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.util.Calendar;
+
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private SensorManager sensorManager;
@@ -65,13 +67,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.unregisterListener(this);
     }
 
+    protected void onDestroy() {
+        super.onDestroy();
+        if (alarmMgr!= null) {
+            alarmMgr.cancel(alarmIntent);
+        }
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float sensorX;
+        float count;
 
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            sensorX = event.values[0];
-            String strTmp ="X: " + sensorX + "\n";
+            count = event.values[0];
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            int[] date = {calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH)+1,calendar.get(Calendar.DATE)};
+
+            String strTmp = date[0] + "/" + date[1] + "/" + date[2] + "\n" + count + "歩\n";
             textView.setText(strTmp);
         }
     }
